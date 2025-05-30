@@ -115,9 +115,9 @@
         
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
         
         .btn {
@@ -172,13 +172,13 @@
         .btn-timer {
             background: #f1f5f9;
             color: #475569;
-            padding: 12px 16px;
+            padding: 12px 14px;
             min-height: 48px;
             justify-content: center;
             flex: 1;
-            min-width: 65px;
-            max-width: 75px;
-            font-size: 14px;
+            min-width: 58px;
+            max-width: 72px;
+            font-size: 13px;
             font-weight: 600;
         }
         
@@ -535,21 +535,39 @@
         
         @media (max-width: 480px) {
             .container {
-                padding: 24px;
+                padding: 20px;
+                max-width: 100%;
             }
             
             .timer-text {
-                font-size: 36px;
+                font-size: 24px;
             }
             
             .progress-ring {
-                width: 160px;
-                height: 160px;
+                width: 140px;
+                height: 140px;
             }
             
             .control-btn {
                 width: 56px;
                 height: 56px;
+            }
+            
+            .btn-timer {
+                padding: 10px 8px;
+                min-height: 44px;
+                min-width: 50px;
+                max-width: 65px;
+                font-size: 12px;
+            }
+            
+            .button-group {
+                gap: 6px;
+            }
+            
+            .btn {
+                padding: 14px 20px;
+                font-size: 13px;
             }
         }
     </style>
