@@ -144,6 +144,12 @@
             background: #fee2e2;
         }
         
+        .btn-work.active {
+            background: #dc2626;
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+        
         .btn-break {
             background: #f0fdf4;
             color: #16a34a;
@@ -151,6 +157,12 @@
         
         .btn-break:hover {
             background: #dcfce7;
+        }
+        
+        .btn-break.active {
+            background: #16a34a;
+            color: white;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
         }
         
         .btn-timer {
@@ -168,6 +180,13 @@
         
         .btn-timer:hover {
             background: #e2e8f0;
+        }
+        
+        .btn-timer.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            transform: translateY(-1px);
         }
         
         .control-buttons {
@@ -629,16 +648,25 @@
         }
         
         function updateUI() {
+            // アクティブボタンのスタイルをリセット
+            document.querySelectorAll('.btn-work, .btn-break, .btn-timer').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
             // モード表示更新
             if (currentMode === 'pomodoro') {
                 if (isWork) {
                     modeIcon.textContent = '💼';
                     modeText.textContent = '作業時間';
                     timerLabel.textContent = '作業中';
+                    // 作業ボタンをアクティブに
+                    document.querySelector('.btn-work').classList.add('active');
                 } else {
                     modeIcon.textContent = '☕';
                     modeText.textContent = '休憩時間';
                     timerLabel.textContent = '休憩中';
+                    // 休憩ボタンをアクティブに
+                    document.querySelector('.btn-break').classList.add('active');
                 }
                 stats.style.display = 'block';
                 
@@ -653,6 +681,14 @@
                 modeText.textContent = 'タイマー';
                 timerLabel.textContent = 'タイマー';
                 stats.style.display = 'none';
+                
+                // アクティブなタイマーボタンを強調
+                const timerButtons = document.querySelectorAll('.btn-timer');
+                const quickTimers = [1, 3, 5, 10, 15];
+                const activeIndex = quickTimers.indexOf(minutes);
+                if (activeIndex !== -1) {
+                    timerButtons[activeIndex].classList.add('active');
+                }
                 
                 // ポモドーロに戻るボタン
                 switchBtn.innerHTML = '🍅';
