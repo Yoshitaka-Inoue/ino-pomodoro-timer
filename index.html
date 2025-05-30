@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍅 ポモドーロタイマー</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            margin: 0;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 24px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        
+        .mode-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .timer-display {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .progress-ring {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto;
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-bg {
+            fill: none;
+            stroke: #f3f4f6;
+            stroke-width: 8;
+        }
+        
+        .progress-ring-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease-linear;
+        }
+        
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .timer-label {
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 16px 28px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 52px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-work {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .btn-work:hover {
+            background: #fee2e2;
+        }
+        
+        .btn-break {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+        
+        .btn-break:hover {
+            background: #dcfce7;
+        }
+        
+        .btn-timer {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 12px 16px;
+            min-height: 48px;
+            justify-content: center;
+            flex: 1;
+            min-width: 65px;
+            max-width: 75px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .btn-timer:hover {
+            background: #e2e8f0;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .control-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn-play {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .btn-pause {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-switch {
+            background: #059669;
+            color: white;
+        }
+        
+        .btn-back {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .stats {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stats-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .stats-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .help {
+            font-size: 10px;
+            color: #666;
+            text-align: left;
+        }
+        
+        .help-toggle {
+            cursor: pointer;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .help-toggle:hover {
+            background: #e2e8f0;
+        }
+        
+        .help-toggle h4 {
+            font-weight: 600;
+            margin: 0;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .help-content {
+            display: none;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .help-content.show {
+            display: block;
+        }
+        
+        .arrow {
+            transition: transform 0.2s ease;
+            font-size: 10px;
+        }
+        
+        .arrow.rotated {
+            transform: rotate(180deg);
+        }
+        
+        .shortcuts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 12px;
+            margin-bottom: 12px;
+        }
+        
+        .shortcut {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        kbd {
+            background: #e5e7eb;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-family: monospace;
+        }
+        
+        .help-list {
+            list-style: none;
+        }
+        
+        .help-list li {
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+        
+        /* アイコン */
+        .icon {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+        
+        .icon-sm {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px;
+            }
+            
+            .timer-text {
+                font-size: 36px;
+            }
+            
+            .progress-ring {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .control-btn {
+                width: 56px;
+                height: 56px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <h1 class="title">🍅 ポモドーロタイマー</h1>
+        <div class="mode-indicator">
+            <span id="mode-icon">💼</span>
+            <span id="mode-text">作業時間</span>
+        </div>
+        
+        <!-- タイマー表示 -->
+        <div class="timer-display">
+            <svg class="progress-ring" viewBox="0 0 120 120">
+                <circle class="progress-ring-bg" cx="60" cy="60" r="54"></circle>
+                <circle id="progress-ring-fill" class="progress-ring-fill" cx="60" cy="60" r="54"></circle>
+            </svg>
+            <div class="timer-text" id="timer-text">25:00</div>
+            <div class="timer-label" id="timer-label">作業中</div>
+        </div>
+        
+        <!-- ポモドーロボタン -->
+        <div class="section">
+            <h3 class="section-title">🍅 ポモドーロタイマー</h3>
+            <div class="button-group">
+                <button class="btn btn-work" onclick="startWorkTimer()" title="⌘ + W">
+                    <svg class="icon-sm" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                    作業 25分
+                </button>
+                <button class="btn btn-break" onclick="startBreakTimer()" title="⌘ + B">
+                    <svg class="icon-sm" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>
+                    休憩 5分
+                </button>
+            </div>
+        </div>
+        
+        <!-- クイックタイマー -->
+        <div class="section">
+            <h3 class="section-title">⚡ タイマー</h3>
+            <div class="button-group">
+                <button class="btn btn-timer" onclick="setQuickTimer(1)" title="⌘ + 1">1分</button>
+                <button class="btn btn-timer" onclick="setQuickTimer(3)" title="⌘ + 2">3分</button>
+                <button class="btn btn-timer" onclick="setQuickTimer(5)" title="⌘ + 3">5分</button>
+                <button class="btn btn-timer" onclick="setQuickTimer(10)" title="⌘ + 4">10分</button>
+                <button class="btn btn-timer" onclick="setQuickTimer(15)" title="⌘ + 5">15分</button>
+            </div>
+        </div>
+        
+        <!-- コントロールボタン -->
+        <div class="control-buttons">
+            <button id="play-btn" class="control-btn btn-play" onclick="toggleTimer()" title="⌘ + Space">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>
+            </button>
+            <button class="control-btn btn-reset" onclick="resetTimer()" title="⌘ + R">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 3v5h5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+            <button id="switch-btn" class="control-btn btn-switch" onclick="switchMode()" title="⌘ + S">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+        </div>
+        
+        <!-- 統計 -->
+        <div id="stats" class="stats">
+            <div class="stats-number" id="completed-count">0</div>
+            <div class="stats-label">完了したポモドーロ</div>
+        </div>
+        
+        <!-- ヘルプ -->
+        <div class="help">
+            <!-- 使い方 -->
+            <div class="help-toggle" onclick="toggleHelpSection('usage')">
+                <h4>
+                    📖 使い方
+                    <span class="arrow" id="usage-arrow">▼</span>
+                </h4>
+            </div>
+            <div class="help-content" id="usage-content">
+                <ul class="help-list">
+                    <li>🍅 <strong>ポモドーロモード：</strong>25分作業 → 5分休憩のサイクル</li>
+                    <li>⚡ <strong>タイマー：</strong>1/3/5/10/15分の簡単タイマー</li>
+                    <li>▶️ 再生/一時停止ボタンでタイマーを開始/停止</li>
+                    <li>🔄 リセットボタンで時間をリセット</li>
+                    <li>☕/💼 作業/休憩の切り替え（ポモドーロモード時）</li>
+                    <li>🍅 ポモドーロモードに戻る（タイマー時）</li>
+                </ul>
+            </div>
+            
+            <!-- ショートカットキー -->
+            <div class="help-toggle" onclick="toggleHelpSection('shortcuts')">
+                <h4>
+                    ⌨️ ショートカットキー
+                    <span class="arrow" id="shortcuts-arrow">▼</span>
+                </h4>
+            </div>
+            <div class="help-content" id="shortcuts-content">
+                <div class="shortcuts">
+                    <div class="shortcut"><kbd>⌘ + Space</kbd> 再生/停止</div>
+                    <div class="shortcut"><kbd>⌘ + R</kbd> リセット</div>
+                    <div class="shortcut"><kbd>⌘ + W</kbd> 作業25分</div>
+                    <div class="shortcut"><kbd>⌘ + B</kbd> 休憩5分</div>
+                    <div class="shortcut"><kbd>⌘ + S</kbd> モード切替</div>
+                    <div class="shortcut"><kbd>⌘ + 1-5</kbd> タイマー</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 基本的なセキュリティ設定
+        (function() {
+            'use strict';
+            
+            // デバッグツール検出（基本レベル）
+            let devtools = false;
+            const checkDevTools = function() {
+                try {
+                    if (window.outerHeight - window.innerHeight > 200 || window.outerWidth - window.innerWidth > 200) {
+                        if (!devtools) {
+                            devtools = true;
+                            if (typeof console !== 'undefined' && console.clear) {
+                                console.clear();
+                            }
+                            if (typeof console !== 'undefined' && console.log) {
+                                console.log('%c⚠️ 開発者ツールが検出されました', 'color: red; font-size: 20px;');
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // エラーを無視
+                }
+            };
+            setInterval(checkDevTools, 1000);
+            
+            // 右クリック無効化
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            }, false);
+            
+            // キーボードショートカット制限
+            document.addEventListener('keydown', function(e) {
+                try {
+                    // F12, Ctrl+Shift+I, Ctrl+U などを無効化
+                    if (e.key === 'F12' || 
+                        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
+                        (e.ctrlKey && e.key === 'U')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                } catch (err) {
+                    // エラーを無視
+                }
+            }, false);
+            
+            // コンソールメッセージ（安全に）
+            try {
+                if (typeof console !== 'undefined') {
+                    if (console.clear) console.clear();
+                    if (console.log) {
+                        console.log('%c🍅 ポモドーロタイマー', 'color: #dc2626; font-size: 16px; font-weight: bold;');
+                        console.log('%c無断での複製や改変は禁止されています', 'color: #666; font-size: 12px;');
+                    }
+                }
+            } catch (e) {
+                // コンソールエラーを無視
+            }
+        })();
+        
+        // グローバル変数
+        let minutes = 25;
+        let seconds = 0;
+        let isActive = false;
+        let isWork = true;
+        let completedPomodoros = 0;
+        let currentMode = 'pomodoro'; // 'pomodoro' or 'timer'
+        let timerInterval = null;
+        
+        const workTime = 25;
+        const breakTime = 5;
+        
+        // DOM要素
+        const timerText = document.getElementById('timer-text');
+        const timerLabel = document.getElementById('timer-label');
+        const modeIcon = document.getElementById('mode-icon');
+        const modeText = document.getElementById('mode-text');
+        const playBtn = document.getElementById('play-btn');
+        const switchBtn = document.getElementById('switch-btn');
+        const progressRing = document.getElementById('progress-ring-fill');
+        const completedCount = document.getElementById('completed-count');
+        const stats = document.getElementById('stats');
+        
+        // プログレスリングの設定
+        const radius = 54;
+        const circumference = 2 * Math.PI * radius;
+        progressRing.style.strokeDasharray = circumference;
+        progressRing.style.strokeDashoffset = circumference;
+        
+        // 初期化
+        updateDisplay();
+        updateUI();
+        
+        // タイマー関数
+        function startTimer() {
+            if (timerInterval) return;
+            
+            timerInterval = setInterval(() => {
+                if (seconds > 0) {
+                    seconds--;
+                } else if (minutes > 0) {
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    // タイマー終了
+                    stopTimer();
+                    handleTimerEnd();
+                }
+                updateDisplay();
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+        
+        function handleTimerEnd() {
+            isActive = false;
+            
+            if (currentMode === 'pomodoro') {
+                if (isWork) {
+                    completedPomodoros++;
+                    isWork = false;
+                    minutes = breakTime;
+                    seconds = 0;
+                    alert('作業時間終了！休憩時間です🍃');
+                } else {
+                    isWork = true;
+                    minutes = workTime;
+                    seconds = 0;
+                    alert('休憩時間終了！作業を始めましょう💪');
+                }
+            } else {
+                alert('タイマー終了です！⏰');
+            }
+            
+            updateDisplay();
+            updateUI();
+        }
+        
+        // UI更新関数
+        function updateDisplay() {
+            const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timerText.textContent = formattedTime;
+            
+            // プログレス更新
+            let progress;
+            if (currentMode === 'pomodoro') {
+                const totalSeconds = isWork ? workTime * 60 : breakTime * 60;
+                const remainingSeconds = minutes * 60 + seconds;
+                progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+            } else {
+                progress = ((60 - seconds) / 60) * 100;
+            }
+            
+            const offset = circumference - (progress / 100) * circumference;
+            progressRing.style.strokeDashoffset = offset;
+            
+            // プログレスリングの色
+            if (currentMode === 'pomodoro') {
+                progressRing.style.stroke = isWork ? '#dc2626' : '#16a34a';
+            } else {
+                progressRing.style.stroke = '#3b82f6';
+            }
+            
+            // 完了カウント更新
+            completedCount.textContent = completedPomodoros;
+        }
+        
+        function updateUI() {
+            // モード表示更新
+            if (currentMode === 'pomodoro') {
+                if (isWork) {
+                    modeIcon.textContent = '💼';
+                    modeText.textContent = '作業時間';
+                    timerLabel.textContent = '作業中';
+                } else {
+                    modeIcon.textContent = '☕';
+                    modeText.textContent = '休憩時間';
+                    timerLabel.textContent = '休憩中';
+                }
+                stats.style.display = 'block';
+                
+                // スイッチボタン更新
+                switchBtn.innerHTML = isWork ? 
+                    '<svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>' :
+                    '<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+                switchBtn.className = isWork ? 'control-btn btn-switch' : 'control-btn btn-switch';
+                switchBtn.title = isWork ? '休憩モードに切り替え (⌘ + S)' : '作業モードに切り替え (⌘ + S)';
+            } else {
+                modeIcon.textContent = '⏱️';
+                modeText.textContent = 'タイマー';
+                timerLabel.textContent = 'タイマー';
+                stats.style.display = 'none';
+                
+                // ポモドーロに戻るボタン
+                switchBtn.innerHTML = '🍅';
+                switchBtn.className = 'control-btn btn-back';
+                switchBtn.title = 'ポモドーロ作業モードに戻る (⌘ + S)';
+            }
+            
+            // 再生/一時停止ボタン更新
+            if (isActive) {
+                playBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>';
+                playBtn.className = 'control-btn btn-pause';
+            } else {
+                playBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>';
+                playBtn.className = 'control-btn btn-play';
+            }
+        }
+        
+        // 操作関数
+        function toggleTimer() {
+            isActive = !isActive;
+            if (isActive) {
+                startTimer();
+            } else {
+                stopTimer();
+            }
+            updateUI();
+        }
+        
+        function resetTimer() {
+            stopTimer();
+            isActive = false;
+            
+            if (currentMode === 'pomodoro') {
+                minutes = isWork ? workTime : breakTime;
+            }
+            // タイマーモードの場合は現在の分数を保持
+            
+            seconds = 0;
+            updateDisplay();
+            updateUI();
+        }
+        
+        function switchMode() {
+            stopTimer();
+            isActive = false;
+            
+            if (currentMode === 'pomodoro') {
+                isWork = !isWork;
+                minutes = isWork ? workTime : breakTime;
+            } else {
+                // タイマーモードからポモドーロに戻る
+                currentMode = 'pomodoro';
+                isWork = true;
+                minutes = workTime;
+            }
+            
+            seconds = 0;
+            updateDisplay();
+            updateUI();
+        }
+        
+        function startWorkTimer() {
+            stopTimer();
+            isActive = false;
+            currentMode = 'pomodoro';
+            isWork = true;
+            minutes = workTime;
+            seconds = 0;
+            updateDisplay();
+            updateUI();
+        }
+        
+        function startBreakTimer() {
+            stopTimer();
+            isActive = false;
+            currentMode = 'pomodoro';
+            isWork = false;
+            minutes = breakTime;
+            seconds = 0;
+            updateDisplay();
+            updateUI();
+        }
+        
+        function setQuickTimer(mins) {
+            stopTimer();
+            isActive = false;
+            currentMode = 'timer';
+            minutes = mins;
+            seconds = 0;
+            updateDisplay();
+            updateUI();
+        }
+        
+        // ヘルプセクションの表示/非表示
+        function toggleHelpSection(sectionId) {
+            const content = document.getElementById(sectionId + '-content');
+            const arrow = document.getElementById(sectionId + '-arrow');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                arrow.classList.remove('rotated');
+                arrow.textContent = '▼';
+            } else {
+                content.classList.add('show');
+                arrow.classList.add('rotated');
+                arrow.textContent = '▲';
+            }
+        }
+        
+        // キーボードショートカット
+        document.addEventListener('keydown', (event) => {
+            if (event.metaKey) {
+                switch (event.key) {
+                    case ' ':
+                        event.preventDefault();
+                        toggleTimer();
+                        break;
+                    case 'r':
+                        event.preventDefault();
+                        resetTimer();
+                        break;
+                    case 'w':
+                        event.preventDefault();
+                        startWorkTimer();
+                        break;
+                    case 'b':
+                        event.preventDefault();
+                        startBreakTimer();
+                        break;
+                    case 's':
+                        event.preventDefault();
+                        switchMode();
+                        break;
+                    case '1':
+                        event.preventDefault();
+                        setQuickTimer(1);
+                        break;
+                    case '2':
+                        event.preventDefault();
+                        setQuickTimer(3);
+                        break;
+                    case '3':
+                        event.preventDefault();
+                        setQuickTimer(5);
+                        break;
+                    case '4':
+                        event.preventDefault();
+                        setQuickTimer(10);
+                        break;
+                    case '5':
+                        event.preventDefault();
+                        setQuickTimer(15);
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
