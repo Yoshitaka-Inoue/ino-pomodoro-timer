@@ -34,6 +34,9 @@
             max-width: 420px;
             width: 100%;
             text-align: center;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
         }
         
         .title {
@@ -242,6 +245,10 @@
             border-radius: 10px;
             padding: 12px;
             margin-bottom: 16px;
+            min-height: 52px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .stats-number {
@@ -259,6 +266,7 @@
             font-size: 10px;
             color: #666;
             text-align: left;
+            margin-top: auto;
         }
         
         .help-toggle {
@@ -668,7 +676,7 @@
                     // 休憩ボタンをアクティブに
                     document.querySelector('.btn-break').classList.add('active');
                 }
-                stats.style.display = 'block';
+                stats.style.display = 'flex';
                 
                 // スイッチボタン更新
                 switchBtn.innerHTML = isWork ? 
@@ -680,7 +688,7 @@
                 modeIcon.textContent = '⏱️';
                 modeText.textContent = 'タイマー';
                 timerLabel.textContent = 'タイマー';
-                stats.style.display = 'none';
+                stats.style.display = 'flex';
                 
                 // アクティブなタイマーボタンを強調
                 const timerButtons = document.querySelectorAll('.btn-timer');
