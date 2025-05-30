@@ -782,6 +782,7 @@
         // 音設定
         let soundType = 'chime'; // 初期設定をチャイムに変更
         let volume = 0.5; // 0.0 - 1.0
+        let currentTimerDuration = 25; // 現在のタイマーの持続時間を記録
         
         // 設定を保存する関数
         function saveSettings() {
@@ -990,7 +991,11 @@
                 const remainingSeconds = minutes * 60 + seconds;
                 progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
             } else {
-                progress = ((60 - seconds) / 60) * 100;
+                // タイマーモード：各タイマーの総時間に基づいて計算
+                const totalMinutes = getCurrentTimerDuration();
+                const totalSeconds = totalMinutes * 60;
+                const remainingSeconds = minutes * 60 + seconds;
+                progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
             }
             
             const offset = circumference - (progress / 100) * circumference;
@@ -1005,6 +1010,16 @@
             
             // 完了カウント更新
             completedCount.textContent = completedPomodoros;
+        }
+        
+        // 現在のタイマーの持続時間を取得
+        function getCurrentTimerDuration() {
+            if (currentMode === 'timer') {
+                return currentTimerDuration;
+            }
+            
+            // ポモドーロモードの場合
+            return isWork ? workTime : breakTime;
         }
         
         function updateUI() {
@@ -1138,6 +1153,8 @@
             currentMode = 'timer';
             minutes = mins;
             seconds = 0;
+            // 選択されたタイマーの時間を記録
+            currentTimerDuration = mins;
             updateDisplay();
             updateUI();
         }
