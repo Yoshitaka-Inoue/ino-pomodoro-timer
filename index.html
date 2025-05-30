@@ -37,6 +37,7 @@
             min-height: 600px;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         
         .title {
@@ -269,6 +270,182 @@
             margin-top: auto;
         }
         
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #6b7280;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .settings-icon:hover {
+            background: #e5e7eb;
+            color: #374151;
+            transform: rotate(90deg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .settings-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .settings-popup.show {
+            display: flex;
+        }
+        
+        .settings-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .settings-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #6b7280;
+        }
+        
+        .settings-close:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .settings-section {
+            margin-bottom: 24px;
+        }
+        
+        .settings-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 16px;
+        }
+        
+        .settings-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        .sound-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .sound-option {
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .sound-option:hover {
+            background: #e2e8f0;
+        }
+        
+        .sound-option.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .volume-control {
+            margin-bottom: 12px;
+        }
+        
+        .volume-control label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .test-button {
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .test-button:hover {
+            background: #059669;
+        }
+        
         .help-toggle {
             cursor: pointer;
             padding: 8px 12px;
@@ -379,6 +556,14 @@
 </head>
 <body>
     <div class="container">
+        <!-- 設定アイコン -->
+        <button class="settings-icon" onclick="toggleSettings()" title="設定">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+        </button>
+        
         <!-- ヘッダー -->
         <h1 class="title">🍅 ポモドーロタイマー</h1>
         <div class="mode-indicator">
@@ -482,6 +667,45 @@
         </div>
     </div>
 
+    <!-- 設定ポップアップ -->
+    <div class="settings-popup" id="settings-popup" onclick="closeSettings(event)">
+        <div class="settings-content" onclick="event.stopPropagation()">
+            <button class="settings-close" onclick="closeSettings()" title="閉じる">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            
+            <div class="settings-section">
+                <h3>⚙️ 設定</h3>
+                
+                <h4>🔊 通知音</h4>
+                <div class="sound-options">
+                    <div class="sound-option active" onclick="selectSound('chime')" id="sound-chime">
+                        🎵 チャイム
+                    </div>
+                    <div class="sound-option" onclick="selectSound('ding')" id="sound-ding">
+                        ✨ ディン
+                    </div>
+                    <div class="sound-option" onclick="selectSound('bell')" id="sound-bell">
+                        🔔 ベル
+                    </div>
+                    <div class="sound-option" onclick="selectSound('none')" id="sound-none">
+                        🔇 なし
+                    </div>
+                </div>
+                
+                <div class="volume-control">
+                    <label for="volume-slider">🔊 音量: <span id="volume-display">50</span>%</label>
+                    <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="50" oninput="updateVolume(this.value)">
+                </div>
+                
+                <button class="test-button" onclick="testSound()">🎵 音をテスト</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 基本的なセキュリティ設定
         (function() {
@@ -555,6 +779,130 @@
         const workTime = 25;
         const breakTime = 5;
         
+        // 音設定
+        let soundType = 'chime'; // 初期設定をチャイムに変更
+        let volume = 0.5; // 0.0 - 1.0
+        
+        // 設定を保存する関数
+        function saveSettings() {
+            const settings = {
+                soundType: soundType,
+                volume: volume
+            };
+            // メモリ内変数として保存（セッション間で保持）
+            window.pomodoroSettings = settings;
+        }
+        
+        // 設定を読み込む関数
+        function loadSettings() {
+            if (window.pomodoroSettings) {
+                const settings = window.pomodoroSettings;
+                soundType = settings.soundType || 'chime';
+                volume = settings.volume || 0.5;
+                
+                // UI更新
+                updateSettingsUI();
+            }
+        }
+        
+        // 音声ファイル（Web Audio API使用）
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // 音を生成する関数
+        function createSound(type, duration = 0.5) {
+            switch (type) {
+                case 'bell':
+                    createBellSound();
+                    break;
+                case 'chime':
+                    createChimeSound();
+                    break;
+                case 'ding':
+                    createDingSound();
+                    break;
+                default:
+                    return;
+            }
+        }
+        
+        // 美しいベルの音
+        function createBellSound() {
+            const notes = [
+                { freq: 523.25, time: 0.0, duration: 1.2 }, // C5
+                { freq: 659.25, time: 0.1, duration: 1.0 }, // E5
+                { freq: 783.99, time: 0.2, duration: 0.8 }, // G5
+            ];
+            
+            notes.forEach(note => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(note.freq, audioContext.currentTime + note.time);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime + note.time);
+                gainNode.gain.linearRampToValueAtTime(volume * 0.6, audioContext.currentTime + note.time + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + note.time + note.duration);
+                
+                oscillator.start(audioContext.currentTime + note.time);
+                oscillator.stop(audioContext.currentTime + note.time + note.duration);
+            });
+        }
+        
+        // チャイムの音
+        function createChimeSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+            oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+            
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        // ディンの音
+        function createDingSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        // 通知音を再生
+        function playNotificationSound() {
+            if (soundType !== 'none') {
+                try {
+                    createSound(soundType);
+                } catch (error) {
+                    console.log('音声再生エラー:', error);
+                }
+            }
+        }
+        
         // DOM要素
         const timerText = document.getElementById('timer-text');
         const timerLabel = document.getElementById('timer-label');
@@ -575,6 +923,7 @@
         // 初期化
         updateDisplay();
         updateUI();
+        loadSettings(); // 設定読み込みを追加
         
         // タイマー関数
         function startTimer() {
@@ -604,6 +953,9 @@
         
         function handleTimerEnd() {
             isActive = false;
+            
+            // 通知音を再生
+            playNotificationSound();
             
             if (currentMode === 'pomodoro') {
                 if (isWork) {
@@ -788,6 +1140,64 @@
             seconds = 0;
             updateDisplay();
             updateUI();
+        }
+        
+        // 設定機能
+        function toggleSettings() {
+            const popup = document.getElementById('settings-popup');
+            popup.classList.toggle('show');
+            
+            // 設定画面を開く時にUIを更新
+            if (popup.classList.contains('show')) {
+                updateSettingsUI();
+            }
+        }
+        
+        function closeSettings(event) {
+            const popup = document.getElementById('settings-popup');
+            if (!event || event.target === popup) {
+                popup.classList.remove('show');
+            }
+        }
+        
+        function selectSound(type) {
+            soundType = type;
+            
+            // すべての音選択肢の active クラスを削除
+            document.querySelectorAll('.sound-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            
+            // 選択された音にアクティブクラスを追加
+            document.getElementById('sound-' + type).classList.add('active');
+            
+            // 設定を保存
+            saveSettings();
+        }
+        
+        function updateVolume(value) {
+            volume = value / 100;
+            document.getElementById('volume-display').textContent = value;
+            
+            // 設定を保存
+            saveSettings();
+        }
+        
+        function updateSettingsUI() {
+            // 音の種類のUI更新
+            document.querySelectorAll('.sound-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.getElementById('sound-' + soundType).classList.add('active');
+            
+            // 音量のUI更新
+            const volumePercent = Math.round(volume * 100);
+            document.getElementById('volume-slider').value = volumePercent;
+            document.getElementById('volume-display').textContent = volumePercent;
+        }
+        
+        function testSound() {
+            playNotificationSound();
         }
         
         // ヘルプセクションの表示/非表示
