@@ -718,13 +718,13 @@
         
         <!-- コントロールボタン -->
         <div class="control-buttons">
-            <button id="play-btn" class="control-btn btn-play" onclick="toggleTimer()" title="⌘ + Space">
+            <button id="play-btn" class="control-btn btn-play" onclick="toggleTimer()" title="⌘ + S">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>
             </button>
             <button class="control-btn btn-reset" onclick="resetTimer()" title="⌘ + R">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 3v5h5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
             </button>
-            <button id="switch-btn" class="control-btn btn-switch" onclick="switchMode()" title="⌘ + S">
+            <button id="switch-btn" class="control-btn btn-switch" onclick="switchMode()" title="⌘ + C">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>
             </button>
         </div>
@@ -764,11 +764,11 @@
             </div>
             <div class="help-content" id="shortcuts-content">
                 <div class="shortcuts">
-                    <div class="shortcut"><kbd>⌘ + Space</kbd> 再生/停止</div>
+                    <div class="shortcut"><kbd>⌘ + S</kbd> 再生/停止</div>
                     <div class="shortcut"><kbd>⌘ + R</kbd> リセット</div>
                     <div class="shortcut"><kbd>⌘ + W</kbd> 作業25分</div>
                     <div class="shortcut"><kbd>⌘ + B</kbd> 休憩5分</div>
-                    <div class="shortcut"><kbd>⌘ + S</kbd> モード切替</div>
+                    <div class="shortcut"><kbd>⌘ + C</kbd> モード切替</div>
                     <div class="shortcut"><kbd>⌘ + 1-5</kbd> タイマー</div>
                 </div>
             </div>
@@ -1195,9 +1195,9 @@
                 // スイッチボタン更新
                 switchBtn.innerHTML = isWork ? 
                     '<svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>' :
-                    '<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+                    '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1.5 0-2.5 1-2.5 2s1 2 2.5 2 2.5-1 2.5-2-1-2-2.5-2zm-1 2.5c0-.3.2-.5.5-.5s.5.2.5.5-.2.5-.5.5-.5-.2-.5-.5z"/><path d="M12 6c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 14c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z"/><path d="M10 3c0-.6-.4-1-1-1s-1 .4-1 1 .4 1 1 1 1-.4 1-1zm6 0c0-.6-.4-1-1-1s-1 .4-1 1 .4 1 1 1 1-.4 1-1z"/></svg>';
                 switchBtn.className = isWork ? 'control-btn btn-switch' : 'control-btn btn-switch';
-                switchBtn.title = isWork ? '休憩モードに切り替え (⌘ + S)' : '作業モードに切り替え (⌘ + S)';
+                switchBtn.title = isWork ? '休憩モードに切り替え (⌘ + C)' : '作業モードに切り替え (⌘ + C)';
             } else {
                 modeIcon.textContent = '⏱️';
                 modeText.textContent = 'タイマー';
@@ -1215,7 +1215,7 @@
                 // ポモドーロに戻るボタン
                 switchBtn.innerHTML = '🍅';
                 switchBtn.className = 'control-btn btn-back';
-                switchBtn.title = 'ポモドーロ作業モードに戻る (⌘ + S)';
+                switchBtn.title = 'ポモドーロ作業モードに戻る (⌘ + C)';
             }
             
             // 再生/一時停止ボタン更新
@@ -1387,10 +1387,15 @@
             // セキュリティ制限をバイパスしてアプリのショートカットを優先
             if (event.metaKey || event.ctrlKey) {
                 switch (event.key) {
-                    case ' ':
+                    case 's':
                         event.preventDefault();
                         event.stopPropagation();
                         toggleTimer();
+                        break;
+                    case 'c':
+                        event.preventDefault();
+                        event.stopPropagation();
+                        switchMode();
                         break;
                     case 'r':
                         event.preventDefault();
@@ -1406,11 +1411,6 @@
                         event.preventDefault();
                         event.stopPropagation();
                         startBreakTimer();
-                        break;
-                    case 's':
-                        event.preventDefault();
-                        event.stopPropagation();
-                        switchMode();
                         break;
                     case '1':
                         event.preventDefault();
