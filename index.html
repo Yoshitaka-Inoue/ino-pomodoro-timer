@@ -666,11 +666,15 @@
         
         <!-- ポモドーロボタン -->
         <div class="section">
-            <h3 class="section-title">🍅 ポモドーロタイマー</h3>
+            <h3 class="section-title">🍅 ポモドーロ</h3>
             <div class="button-group">
                 <button class="btn btn-work" onclick="startWorkTimer()" title="⌘ + W">
                     <div style="display: flex; align-items: baseline; gap: 6px;">
-                        <svg class="icon-sm" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><path d="M8 21l4-7 4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21l2-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 21l-2-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17V3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="6" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2c-1.5 0-2.5 1-2.5 2s1 2 2.5 2 2.5-1 2.5-2-1-2-2.5-2zm-1 2.5c0-.3.2-.5.5-.5s.5.2.5.5-.2.5-.5.5-.5-.2-.5-.5z"/>
+                            <path d="M12 6c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 14c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z"/>
+                            <path d="M10 3c0-.6-.4-1-1-1s-1 .4-1 1 .4 1 1 1 1-.4 1-1zm6 0c0-.6-.4-1-1-1s-1 .4-1 1 .4 1 1 1 1-.4 1-1z"/>
+                        </svg>
                         <span class="pomodoro-number">25</span>
                         <span class="pomodoro-unit">分</span>
                     </div>
@@ -845,12 +849,15 @@
             // キーボードショートカット制限
             document.addEventListener('keydown', function(e) {
                 try {
-                    // F12, Ctrl+Shift+I, Ctrl+U などを無効化
+                    // F12, Ctrl+Shift+I, Ctrl+U などを無効化（ただしCmd+のショートカットは除外）
                     if (e.key === 'F12' || 
                         (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
                         (e.ctrlKey && e.key === 'U')) {
-                        e.preventDefault();
-                        return false;
+                        // Cmd+のショートカットは除外
+                        if (!e.metaKey) {
+                            e.preventDefault();
+                            return false;
+                        }
                     }
                 } catch (err) {
                     // エラーを無視
@@ -1377,51 +1384,62 @@
         
         // キーボードショートカット
         document.addEventListener('keydown', (event) => {
-            if (event.metaKey) {
+            // セキュリティ制限をバイパスしてアプリのショートカットを優先
+            if (event.metaKey || event.ctrlKey) {
                 switch (event.key) {
                     case ' ':
                         event.preventDefault();
+                        event.stopPropagation();
                         toggleTimer();
                         break;
                     case 'r':
                         event.preventDefault();
+                        event.stopPropagation();
                         resetTimer();
                         break;
                     case 'w':
                         event.preventDefault();
+                        event.stopPropagation();
                         startWorkTimer();
                         break;
                     case 'b':
                         event.preventDefault();
+                        event.stopPropagation();
                         startBreakTimer();
                         break;
                     case 's':
                         event.preventDefault();
+                        event.stopPropagation();
                         switchMode();
                         break;
                     case '1':
                         event.preventDefault();
+                        event.stopPropagation();
                         setQuickTimer(1);
                         break;
                     case '2':
                         event.preventDefault();
+                        event.stopPropagation();
                         setQuickTimer(3);
                         break;
                     case '3':
                         event.preventDefault();
+                        event.stopPropagation();
                         setQuickTimer(5);
                         break;
                     case '4':
                         event.preventDefault();
+                        event.stopPropagation();
                         setQuickTimer(10);
                         break;
                     case '5':
                         event.preventDefault();
+                        event.stopPropagation();
                         setQuickTimer(15);
                         break;
                 }
             }
-        });
+        }, true); // キャプチャフェーズで実行して優先度を上げる
     </script>
 </body>
 </html>
