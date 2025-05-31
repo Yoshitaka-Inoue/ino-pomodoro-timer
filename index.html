@@ -1,10 +1,4 @@
-.btn-work.active .pomodoro-text {
-            opacity: 1;
-        }
-        
-        .btn-break.active .pomodoro-text {
-            opacity: 1;
-        }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -675,23 +669,17 @@
             <h3 class="section-title">🍅 ポモドーロタイマー</h3>
             <div class="button-group">
                 <button class="btn btn-work" onclick="startWorkTimer()" title="⌘ + W">
-                    <div style="display: flex; align-items: baseline; gap: 4px;">
+                    <div style="display: flex; align-items: baseline; gap: 6px;">
+                        <svg class="icon-sm" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><path d="M8 21l4-7 4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21l2-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 21l-2-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17V3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="6" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
                         <span class="pomodoro-number">25</span>
                         <span class="pomodoro-unit">分</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <svg class="icon-sm" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                        <span class="pomodoro-label">作業</span>
-                    </div>
                 </button>
                 <button class="btn btn-break" onclick="startBreakTimer()" title="⌘ + B">
-                    <div style="display: flex; align-items: baseline; gap: 4px;">
+                    <div style="display: flex; align-items: baseline; gap: 6px;">
+                        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>
                         <span class="pomodoro-number">5</span>
                         <span class="pomodoro-unit">分</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>
-                        <span class="pomodoro-label">休憩</span>
                     </div>
                 </button>
             </div>
@@ -923,7 +911,28 @@
         }
         
         // 音声ファイル（Web Audio API使用）
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let audioContext;
+        
+        // AudioContextの初期化
+        function initAudioContext() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                return true;
+            } catch (error) {
+                console.log('Audio Context初期化エラー:', error);
+                return false;
+            }
+        }
+        
+        // 初回クリック時にAudioContextを開始
+        function ensureAudioContext() {
+            if (!audioContext) {
+                initAudioContext();
+            }
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume().catch(e => console.log('AudioContext resume エラー:', e));
+            }
+        }
         
         // 音を生成する関数
         function createSound(type, duration = 0.5) {
@@ -951,69 +960,84 @@
             ];
             
             notes.forEach(note => {
+                try {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(note.freq, audioContext.currentTime + note.time);
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + note.time);
+                    gainNode.gain.linearRampToValueAtTime(volume * 0.6, audioContext.currentTime + note.time + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + note.time + note.duration);
+                    
+                    oscillator.start(audioContext.currentTime + note.time);
+                    oscillator.stop(audioContext.currentTime + note.time + note.duration);
+                } catch (error) {
+                    console.log('ベル音生成エラー:', error);
+                }
+            });
+        }
+        
+        // チャイムの音
+        function createChimeSound() {
+            try {
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
-                oscillator.frequency.setValueAtTime(note.freq, audioContext.currentTime + note.time);
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                
                 oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
                 
-                gainNode.gain.setValueAtTime(0, audioContext.currentTime + note.time);
-                gainNode.gain.linearRampToValueAtTime(volume * 0.6, audioContext.currentTime + note.time + 0.02);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + note.time + note.duration);
-                
-                oscillator.start(audioContext.currentTime + note.time);
-                oscillator.stop(audioContext.currentTime + note.time + note.duration);
-            });
-        }
-        
-        // チャイムの音
-        function createChimeSound() {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
-            oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
-            
-            oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (error) {
+                console.log('チャイム音生成エラー:', error);
+            }
         }
         
         // ディンの音
         function createDingSound() {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (error) {
+                console.log('ディン音生成エラー:', error);
+            }
         }
         
         // 通知音を再生
         function playNotificationSound() {
             if (soundType !== 'none') {
                 try {
-                    createSound(soundType);
+                    ensureAudioContext();
+                    if (audioContext) {
+                        createSound(soundType);
+                    }
                 } catch (error) {
                     console.log('音声再生エラー:', error);
                 }
@@ -1041,6 +1065,7 @@
         updateDisplay();
         updateUI();
         loadSettings(); // 設定読み込みを追加
+        initAudioContext(); // Audio Contextを初期化
         
         // タイマー関数
         function startTimer() {
@@ -1133,7 +1158,6 @@
             if (currentMode === 'timer') {
                 return currentTimerDuration;
             }
-            
             // ポモドーロモードの場合
             return isWork ? workTime : breakTime;
         }
@@ -1147,7 +1171,7 @@
             // モード表示更新
             if (currentMode === 'pomodoro') {
                 if (isWork) {
-                    modeIcon.textContent = '💼';
+                    modeIcon.textContent = '🍅';
                     modeText.textContent = '作業時間';
                     timerLabel.textContent = '作業中';
                     // 作業ボタンをアクティブに
@@ -1199,6 +1223,7 @@
         
         // 操作関数
         function toggleTimer() {
+            ensureAudioContext(); // 音声コンテキストを確保
             isActive = !isActive;
             if (isActive) {
                 startTimer();
@@ -1330,6 +1355,7 @@
         }
         
         function testSound() {
+            ensureAudioContext();
             playNotificationSound();
         }
         
