@@ -227,7 +227,7 @@
         }
         
         .btn-timer.active {
-            background: #3b82f6;
+            background: #60a5fa;
             color: white;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
             transform: translateY(-1px);
@@ -1165,15 +1165,18 @@
             // プログレスリングの色をモードに応じて設定
             if (currentMode === 'pomodoro') {
                 if (isWork) {
-                    progressRing.style.stroke = '#dc2626'; // 作業時は赤
+                    progressRing.style.stroke = '#f87171'; // 作業時はより明るい赤
                     document.querySelector('.progress-ring-bg').style.stroke = '#fecaca'; // 薄い赤の背景
+                    timerText.style.color = '#f87171'; // タイマー数字もより明るい赤
                 } else {
-                    progressRing.style.stroke = '#16a34a'; // 休憩時は緑
+                    progressRing.style.stroke = '#4ade80'; // 休憩時はより明るい緑
                     document.querySelector('.progress-ring-bg').style.stroke = '#bbf7d0'; // 薄い緑の背景
+                    timerText.style.color = '#4ade80'; // タイマー数字もより明るい緑
                 }
             } else {
-                progressRing.style.stroke = '#3b82f6'; // タイマー時は青
+                progressRing.style.stroke = '#60a5fa'; // タイマー時はより明るい青
                 document.querySelector('.progress-ring-bg').style.stroke = '#dbeafe'; // 薄い青の背景
+                timerText.style.color = '#60a5fa'; // タイマー数字もより明るい青
             }
             
             // 完了カウント更新
