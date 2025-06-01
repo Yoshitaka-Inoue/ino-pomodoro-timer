@@ -269,12 +269,12 @@
         }
         
         .btn-play {
-            background: #16a34a;
+            background: #0891b2;
             color: white;
         }
         
         .btn-pause {
-            background: #dc2626;
+            background: #f59e0b;
             color: white;
         }
         
@@ -1255,8 +1255,10 @@
             
             if (currentMode === 'pomodoro') {
                 minutes = isWork ? workTime : breakTime;
+            } else {
+                // タイマーモードの場合は現在設定されている時間にリセット
+                minutes = currentTimerDuration;
             }
-            // タイマーモードの場合は現在の分数を保持
             
             seconds = 0;
             updateDisplay();
