@@ -255,6 +255,14 @@
             justify-content: center;
         }
         
+        .control-btn.play-wide {
+            width: 120px;
+            height: 60px;
+            border-radius: 30px;
+            padding: 0 20px;
+            gap: 8px;
+        }
+        
         .control-btn:hover {
             transform: scale(1.05);
         }
@@ -576,7 +584,7 @@
             fill: currentColor;
         }
         
-        @media (max-width: 480px) {
+                    @media (max-width: 480px) {
             .container {
                 padding: 20px;
                 max-width: 100%;
@@ -594,6 +602,14 @@
             .control-btn {
                 width: 56px;
                 height: 56px;
+            }
+            
+            .control-btn.play-wide {
+                width: 100px;
+                height: 56px;
+                border-radius: 28px;
+                padding: 0 16px;
+                gap: 6px;
             }
             
             .btn-timer {
@@ -718,14 +734,12 @@
         
         <!-- コントロールボタン -->
         <div class="control-buttons">
-            <button id="play-btn" class="control-btn btn-play" onclick="toggleTimer()" title="⌘ + S">
+            <button id="play-btn" class="control-btn btn-play play-wide" onclick="toggleTimer()" title="⌘ + S">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>
+                <span id="play-text">開始</span>
             </button>
             <button class="control-btn btn-reset" onclick="resetTimer()" title="⌘ + R">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 3v5h5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-            </button>
-            <button id="switch-btn" class="control-btn btn-switch" onclick="switchMode()" title="⌘ + C">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>
             </button>
         </div>
         
@@ -750,7 +764,6 @@
                     <li>⚡ <strong>タイマー：</strong>1/3/5/10/15分の簡単タイマー</li>
                     <li>▶️ 再生/一時停止ボタンでタイマーを開始/停止</li>
                     <li>🔄 リセットボタンで時間をリセット</li>
-                    <li>☕/💼 作業/休憩の切り替え（ポモドーロモード時）</li>
                     <li>🍅 ポモドーロモードに戻る（タイマー時）</li>
                 </ul>
             </div>
@@ -768,7 +781,6 @@
                     <div class="shortcut"><kbd>⌘ + R</kbd> リセット</div>
                     <div class="shortcut"><kbd>⌘ + W</kbd> 作業25分</div>
                     <div class="shortcut"><kbd>⌘ + B</kbd> 休憩5分</div>
-                    <div class="shortcut"><kbd>⌘ + C</kbd> モード切替</div>
                     <div class="shortcut"><kbd>⌘ + 1-5</kbd> タイマー</div>
                 </div>
             </div>
@@ -1191,13 +1203,6 @@
                     document.querySelector('.btn-break').classList.add('active');
                 }
                 stats.style.display = 'flex';
-                
-                // スイッチボタン更新
-                switchBtn.innerHTML = isWork ? 
-                    '<svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"/></svg>' :
-                    '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1.5 0-2.5 1-2.5 2s1 2 2.5 2 2.5-1 2.5-2-1-2-2.5-2zm-1 2.5c0-.3.2-.5.5-.5s.5.2.5.5-.2.5-.5.5-.5-.2-.5-.5z"/><path d="M12 6c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 14c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z"/><path d="M10 3c0-.6-.4-1-1-1s-1 .4-1 1 .4 1 1 1 1-.4 1-1zm6 0c0-.6-.4-1-1-1s-1 .4-1 1 .4 1 1 1 1-.4 1-1z"/></svg>';
-                switchBtn.className = isWork ? 'control-btn btn-switch' : 'control-btn btn-switch';
-                switchBtn.title = isWork ? '休憩モードに切り替え (⌘ + C)' : '作業モードに切り替え (⌘ + C)';
             } else {
                 modeIcon.textContent = '⏱️';
                 modeText.textContent = 'タイマー';
@@ -1211,20 +1216,16 @@
                 if (activeIndex !== -1) {
                     timerButtons[activeIndex].classList.add('active');
                 }
-                
-                // ポモドーロに戻るボタン
-                switchBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-1.5 0-2.5 1-2.5 2s1 2 2.5 2 2.5-1 2.5-2-1-2-2.5-2zm-1 2.5c0-.3.2-.5.5-.5s.5.2.5.5-.2.5-.5.5-.5-.2-.5-.5z"/><path d="M12 6c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 14c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z"/><path d="M10 3c0-.6-.4-1-1-1s-1 .4-1 1 .4 1 1 1 1-.4 1-1zm6 0c0-.6-.4-1-1-1s-1 .4-1 1 .4 1 1 1 1-.4 1-1z"/></svg>';
-                switchBtn.className = 'control-btn btn-back';
-                switchBtn.title = 'ポモドーロ作業モードに戻る (⌘ + C)';
             }
             
             // 再生/一時停止ボタン更新
+            const playText = document.getElementById('play-text');
             if (isActive) {
-                playBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>';
-                playBtn.className = 'control-btn btn-pause';
+                playBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg><span id="play-text">停止</span>';
+                playBtn.className = 'control-btn btn-pause play-wide';
             } else {
-                playBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>';
-                playBtn.className = 'control-btn btn-play';
+                playBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg><span id="play-text">開始</span>';
+                playBtn.className = 'control-btn btn-play play-wide';
             }
         }
         
@@ -1255,22 +1256,7 @@
         }
         
         function switchMode() {
-            stopTimer();
-            isActive = false;
-            
-            if (currentMode === 'pomodoro') {
-                isWork = !isWork;
-                minutes = isWork ? workTime : breakTime;
-            } else {
-                // タイマーモードからポモドーロに戻る
-                currentMode = 'pomodoro';
-                isWork = true;
-                minutes = workTime;
-            }
-            
-            seconds = 0;
-            updateDisplay();
-            updateUI();
+            // この関数はもう使用されないため削除
         }
         
         function startWorkTimer() {
@@ -1395,7 +1381,7 @@
                     case 'c':
                         event.preventDefault();
                         event.stopPropagation();
-                        switchMode();
+                        // switchMode(); // 機能削除
                         break;
                     case 'r':
                         event.preventDefault();
