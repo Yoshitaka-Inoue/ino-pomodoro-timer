@@ -866,8 +866,8 @@
                     if (e.key === 'F12' || 
                         (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
                         (e.ctrlKey && e.key === 'U')) {
-                        // Cmd+のショートカットは除外
-                        if (!e.metaKey) {
+                        // Cmd+のショートカットやアプリ用のショートカットは除外
+                        if (!e.metaKey && !isAppShortcut(e)) {
                             e.preventDefault();
                             return false;
                         }
@@ -876,6 +876,14 @@
                     // エラーを無視
                 }
             }, false);
+            
+            // アプリ用のショートカットかどうかを判定
+            function isAppShortcut(e) {
+                if (e.metaKey || e.ctrlKey) {
+                    return ['s', 'c', 'r', 'w', 'b', '1', '2', '3', '4', '5'].includes(e.key.toLowerCase());
+                }
+                return false;
+            }
             
             // コンソールメッセージ（安全に）
             try {
@@ -1383,62 +1391,105 @@
         
         // キーボードショートカット
         document.addEventListener('keydown', (event) => {
-            // セキュリティ制限をバイパスしてアプリのショートカットを優先
-            if (event.metaKey || event.ctrlKey) {
-                switch (event.key) {
+            // Safari対応: metaKey（Cmd）またはctrlKey（Ctrl）をチェック
+            const isModifierPressed = event.metaKey || event.ctrlKey;
+            
+            if (isModifierPressed) {
+                const key = event.key.toLowerCase();
+                let handled = false;
+                
+                switch (key) {
                     case 's':
                         event.preventDefault();
                         event.stopPropagation();
                         toggleTimer();
+                        handled = true;
                         break;
                     case 'c':
-                        event.preventDefault();
-                        event.stopPropagation();
-                        // switchMode(); // 機能削除
+                        // Safariでのコピー機能と衝突しないように、より厳密にチェック
+                        if (!event.shiftKey && !event.altKey) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            // switchMode(); // 機能削除済み
+                            handled = true;
+                        }
                         break;
                     case 'r':
                         event.preventDefault();
                         event.stopPropagation();
                         resetTimer();
+                        handled = true;
                         break;
                     case 'w':
                         event.preventDefault();
                         event.stopPropagation();
                         startWorkTimer();
+                        handled = true;
                         break;
                     case 'b':
                         event.preventDefault();
                         event.stopPropagation();
                         startBreakTimer();
+                        handled = true;
                         break;
                     case '1':
                         event.preventDefault();
                         event.stopPropagation();
                         setQuickTimer(1);
+                        handled = true;
                         break;
                     case '2':
                         event.preventDefault();
                         event.stopPropagation();
                         setQuickTimer(3);
+                        handled = true;
                         break;
                     case '3':
                         event.preventDefault();
                         event.stopPropagation();
                         setQuickTimer(5);
+                        handled = true;
                         break;
                     case '4':
                         event.preventDefault();
                         event.stopPropagation();
                         setQuickTimer(10);
+                        handled = true;
                         break;
                     case '5':
                         event.preventDefault();
                         event.stopPropagation();
                         setQuickTimer(15);
+                        handled = true;
                         break;
                 }
+                
+                // Safari特有の処理: handled=trueの場合は確実にデフォルト動作を防ぐ
+                if (handled) {
+                    event.returnValue = false;
+                    return false;
+                }
             }
-        }, true); // キャプチャフェーズで実行して優先度を上げる
+        }, {
+            passive: false,
+            capture: true
+        }); // Safari対応: passive: false を明示的に設定
+        
+        // Safari対応: 追加のイベントリスナー
+        document.addEventListener('keypress', (event) => {
+            const isModifierPressed = event.metaKey || event.ctrlKey;
+            if (isModifierPressed) {
+                const key = event.key.toLowerCase();
+                if (['s', 'r', 'w', 'b', '1', '2', '3', '4', '5'].includes(key)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
+            }
+        }, {
+            passive: false,
+            capture: true
+        });
     </script>
 </body>
 </html>
