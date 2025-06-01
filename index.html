@@ -71,7 +71,7 @@
         
         .progress-ring-bg {
             fill: none;
-            stroke: #f3f4f6;
+            stroke: #fecaca;
             stroke-width: 8;
         }
         
@@ -80,6 +80,7 @@
             stroke-width: 8;
             stroke-linecap: round;
             transition: stroke-dashoffset 1s ease-linear;
+            stroke: #dc2626;
         }
         
         .timer-text {
@@ -1078,7 +1079,7 @@
         const radius = 54;
         const circumference = 2 * Math.PI * radius;
         progressRing.style.strokeDasharray = circumference;
-        progressRing.style.strokeDashoffset = circumference;
+        progressRing.style.strokeDashoffset = 0; // 初期は満タン表示
         
         // 初期化
         updateDisplay();
@@ -1149,23 +1150,30 @@
             if (currentMode === 'pomodoro') {
                 const totalSeconds = isWork ? workTime * 60 : breakTime * 60;
                 const remainingSeconds = minutes * 60 + seconds;
-                progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+                progress = (remainingSeconds / totalSeconds) * 100; // 残り時間の割合
             } else {
                 // タイマーモード：各タイマーの総時間に基づいて計算
                 const totalMinutes = getCurrentTimerDuration();
                 const totalSeconds = totalMinutes * 60;
                 const remainingSeconds = minutes * 60 + seconds;
-                progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+                progress = (remainingSeconds / totalSeconds) * 100; // 残り時間の割合
             }
             
             const offset = circumference - (progress / 100) * circumference;
             progressRing.style.strokeDashoffset = offset;
             
-            // プログレスリングの色
+            // プログレスリングの色をモードに応じて設定
             if (currentMode === 'pomodoro') {
-                progressRing.style.stroke = isWork ? '#dc2626' : '#16a34a';
+                if (isWork) {
+                    progressRing.style.stroke = '#dc2626'; // 作業時は赤
+                    document.querySelector('.progress-ring-bg').style.stroke = '#fecaca'; // 薄い赤の背景
+                } else {
+                    progressRing.style.stroke = '#16a34a'; // 休憩時は緑
+                    document.querySelector('.progress-ring-bg').style.stroke = '#bbf7d0'; // 薄い緑の背景
+                }
             } else {
-                progressRing.style.stroke = '#3b82f6';
+                progressRing.style.stroke = '#3b82f6'; // タイマー時は青
+                document.querySelector('.progress-ring-bg').style.stroke = '#dbeafe'; // 薄い青の背景
             }
             
             // 完了カウント更新
